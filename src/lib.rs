@@ -26,6 +26,7 @@ pub struct SourcePos {
 pub struct SourceRange {
     pub start: SourcePos,
     pub end: SourcePos,
+    pub in_map: bool
 }
 
 #[derive(Debug, Clone, PartialEq)]
