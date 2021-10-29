@@ -7,14 +7,26 @@ use std::borrow::Cow;
 pub mod decl;
 pub mod expr;
 pub mod pat;
-pub mod stmt;
 #[cfg(feature = "esprima")]
 pub mod serde;
+pub mod stmt;
 
 use decl::Decl;
 use expr::{Expr, Lit, Prop};
 use pat::Pat;
 use stmt::Stmt;
+
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
+pub struct SourcePos {
+    pub line: u32,
+    pub col: u32,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
+pub struct SourceRange {
+    pub start: SourcePos,
+    pub end: SourcePos,
+}
 
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(
@@ -24,17 +36,20 @@ use stmt::Stmt;
 #[cfg_attr(all(feature = "serde", feature = "esprima"), derive(Deserialize))]
 pub struct Ident<'a> {
     pub name: Cow<'a, str>,
+    pub s_loc: SourceRange,
 }
 
 impl<'a> Ident<'a> {
-    pub fn new(s: String) -> Self {
+    pub fn new(s: String, s_loc: SourceRange) -> Self {
         Ident {
-            name: Cow::Owned(s)
+            name: Cow::Owned(s),
+            s_loc,
         }
     }
-    pub fn from(s: &'a str) -> Self {
+    pub fn from(s: &'a str, s_loc: SourceRange) -> Self {
         Ident {
-            name: Cow::Borrowed(s)
+            name: Cow::Borrowed(s),
+            s_loc,
         }
     }
 }
@@ -74,7 +89,7 @@ impl<'a> Program<'a> {
     derive(Deserialize, Serialize)
 )]
 #[cfg_attr(all(feature = "serde", feature = "esprima"), derive(Deserialize))]
-#[cfg_attr(all(feature = "serde", feature = "esprima"), serde(untagged))] 
+#[cfg_attr(all(feature = "serde", feature = "esprima"), serde(untagged))]
 pub enum ProgramPart<'a> {
     /// A Directive like `'use strict';`
     Dir(Dir<'a>),
@@ -128,11 +143,11 @@ pub struct Func<'a> {
 
 impl<'a> Func<'a> {
     pub fn new(
-        id: Option<Ident<'a>>, 
-        params: Vec<FuncArg<'a>>, 
-        body: FuncBody<'a>, 
-        generator: bool, 
-        is_async: bool
+        id: Option<Ident<'a>>,
+        params: Vec<FuncArg<'a>>,
+        body: FuncBody<'a>,
+        generator: bool,
+        is_async: bool,
     ) -> Self {
         Func {
             id,
@@ -216,7 +231,11 @@ pub struct Class<'a> {
 pub struct ClassBody<'a>(pub Vec<Prop<'a>>);
 
 impl<'a> Class<'a> {
-    pub fn new(id: Option<Ident<'a>>, super_class: Option<Expr<'a>>, body: Vec<Prop<'a>>) -> Class<'a> {
+    pub fn new(
+        id: Option<Ident<'a>>,
+        super_class: Option<Expr<'a>>,
+        body: Vec<Prop<'a>>,
+    ) -> Class<'a> {
         Class {
             id,
             super_class: super_class.map(Box::new),
@@ -232,13 +251,15 @@ impl<'a> Class<'a> {
     derive(Deserialize, Serialize)
 )]
 #[cfg_attr(all(feature = "serde", feature = "esprima"), derive(Deserialize))]
-#[cfg_attr(all(feature = "serde", feature = "esprima"), serde(rename_all = "camelCase", untagged))]
+#[cfg_attr(
+    all(feature = "serde", feature = "esprima"),
+    serde(rename_all = "camelCase", untagged)
+)]
 pub enum VarKind {
     Var,
     Let,
     Const,
 }
-
 
 /// The available operators for assignment Exprs
 #[derive(Debug, Clone, PartialEq, Copy)]
@@ -263,7 +284,6 @@ pub enum AssignOp {
     PowerOfEqual,
 }
 
-
 /// The available logical operators
 #[derive(Debug, Clone, PartialEq, Copy)]
 #[cfg_attr(
@@ -275,7 +295,6 @@ pub enum LogicalOp {
     Or,
     And,
 }
-
 
 /// The available operations for `Binary` Exprs
 #[derive(Debug, Clone, PartialEq, Copy)]
@@ -309,7 +328,6 @@ pub enum BinaryOp {
     PowerOf,
 }
 
-
 /// `++` or `--`
 #[derive(Debug, Clone, PartialEq, Copy)]
 #[cfg_attr(
@@ -340,7 +358,6 @@ pub enum UnaryOp {
     Delete,
 }
 
-
 /// A flag for determining what kind of property
 #[derive(Debug, Clone, PartialEq, Copy)]
 #[cfg_attr(
@@ -362,88 +379,23 @@ pub enum PropKind {
 }
 
 pub mod prelude {
-    pub use crate::{
-        AssignOp,
-        BinaryOp,
-        Class,
-        ClassBody,
-        Dir,
-        Func,
-        FuncArg,
-        FuncBody,
-        Ident,
-        LogicalOp,
-        Program,
-        ProgramPart,
-        PropKind,
-        UnaryOp,
-        UpdateOp,
-        VarKind,
+    pub use crate::decl::{
+        Decl, DefaultExportDecl, ExportSpecifier, ImportSpecifier, ModDecl, ModExport, ModImport,
+        NamedExportDecl, NormalImportSpec, VarDecl,
     };
     pub use crate::expr::{
-        ArrayExpr,
-        ArrowFuncBody,
-        ArrowFuncExpr,
-        AssignExpr,
-        AssignLeft,
-        BinaryExpr,
-        CallExpr,
-        ConditionalExpr,
-        Expr,
-        Lit,
-        LogicalExpr,
-        MemberExpr,
-        MetaProp,
-        NewExpr,
-        ObjExpr,
-        ObjProp,
-        Prop,
-        PropKey,
-        PropValue,
-        RegEx,
-        StringLit,
-        TaggedTemplateExpr,
-        TemplateElement,
-        TemplateLit,
-        UnaryExpr,
-        UpdateExpr,
-        YieldExpr,
+        ArrayExpr, ArrowFuncBody, ArrowFuncExpr, AssignExpr, AssignLeft, BinaryExpr, CallExpr,
+        ConditionalExpr, Expr, Lit, LogicalExpr, MemberExpr, MetaProp, NewExpr, ObjExpr, ObjProp,
+        Prop, PropKey, PropValue, RegEx, StringLit, TaggedTemplateExpr, TemplateElement,
+        TemplateLit, UnaryExpr, UpdateExpr, YieldExpr,
     };
-    pub use crate::decl::{
-        Decl,
-        VarDecl,
-        ModDecl,
-        ModImport,
-        ImportSpecifier,
-        ModExport,
-        NamedExportDecl,
-        DefaultExportDecl,
-        ExportSpecifier,
-        NormalImportSpec
-    };
+    pub use crate::pat::{ArrayPatPart, AssignPat, ObjPat, ObjPatPart, Pat};
     pub use crate::stmt::{
-        Stmt,
-        WithStmt,
-        LabeledStmt,
-        IfStmt,
-        SwitchStmt,
-        SwitchCase,
-        BlockStmt,
-        TryStmt,
-        CatchClause,
-        WhileStmt,
-        DoWhileStmt,
-        ForStmt,
-        LoopInit,
-        ForInStmt,
-        ForOfStmt,
-        LoopLeft,
+        BlockStmt, CatchClause, DoWhileStmt, ForInStmt, ForOfStmt, ForStmt, IfStmt, LabeledStmt,
+        LoopInit, LoopLeft, Stmt, SwitchCase, SwitchStmt, TryStmt, WhileStmt, WithStmt,
     };
-    pub use crate::pat::{
-        ArrayPatPart,
-        AssignPat,
-        ObjPat,
-        ObjPatPart,
-        Pat,
+    pub use crate::{
+        AssignOp, BinaryOp, Class, ClassBody, Dir, Func, FuncArg, FuncBody, Ident, LogicalOp,
+        Program, ProgramPart, PropKind, UnaryOp, UpdateOp, VarKind,
     };
 }

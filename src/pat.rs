@@ -1,5 +1,5 @@
 use crate::expr::{Expr, Prop};
-use crate::{Ident};
+use crate::{Ident, SourceRange};
 /// All of the different ways you can declare an identifier
 /// and/or value
 #[derive(Debug, Clone, PartialEq)]
@@ -18,10 +18,8 @@ pub enum Pat<'a> {
 }
 
 impl<'a> Pat<'a> {
-    pub fn ident_from(s: &'a str) -> Self {
-        Pat::Ident(
-            Ident::from(s)
-        )
+    pub fn ident_from(s: &'a str, s_loc: SourceRange) -> Self {
+        Pat::Ident(Ident::from(s, s_loc))
     }
 }
 

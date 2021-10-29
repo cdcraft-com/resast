@@ -1,5 +1,5 @@
 use crate::pat::Pat;
-use crate::{AssignOp, BinaryOp, LogicalOp, PropKind, UnaryOp, UpdateOp};
+use crate::{AssignOp, BinaryOp, LogicalOp, PropKind, SourceRange, UnaryOp, UpdateOp};
 use crate::{Class, Func, FuncArg, FuncBody, Ident};
 use std::borrow::Cow;
 /// A slightly more granular program part that a statement
@@ -94,8 +94,8 @@ pub enum Expr<'a> {
 }
 
 impl<'a> Expr<'a> {
-    pub fn ident_from(s: &'a str) -> Self {
-        Expr::Ident(Ident::from(s))
+    pub fn ident_from(s: &'a str, s_loc: SourceRange) -> Self {
+        Expr::Ident(Ident::from(s, s_loc))
     }
 }
 
@@ -425,14 +425,14 @@ impl<'a> StringLit<'a> {
     }
     pub fn clone_inner(&self) -> Cow<'a, str> {
         match self {
-            StringLit::Single(ref s) => s.clone(),
-            StringLit::Double(ref s) => s.clone(),
+            StringLit::Double(s) => s.clone(),
+            StringLit::Single(s) => s.clone(),
         }
     }
     pub fn inner_matches(&self, o: &str) -> bool {
         match self {
-            StringLit::Single(ref s) => s == o,
-            StringLit::Double(ref d) => d == o,
+            StringLit::Single(s) => s == o,
+            StringLit::Double(d) => d == o,
         }
     }
 }
