@@ -23,10 +23,11 @@ pub struct SourcePos {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
-pub struct SourceRange {
+pub struct SourceSpan {
     pub start: SourcePos,
     pub end: SourcePos,
-    pub in_map: bool
+    pub in_map: bool,
+    pub source: Option<String>
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -37,17 +38,17 @@ pub struct SourceRange {
 #[cfg_attr(all(feature = "serde", feature = "esprima"), derive(Deserialize))]
 pub struct Ident<'a> {
     pub name: Cow<'a, str>,
-    pub s_loc: SourceRange,
+    pub s_loc: SourceSpan,
 }
 
 impl<'a> Ident<'a> {
-    pub fn new(s: String, s_loc: SourceRange) -> Self {
+    pub fn new(s: String, s_loc: SourceSpan) -> Self {
         Ident {
             name: Cow::Owned(s),
             s_loc,
         }
     }
-    pub fn from(s: &'a str, s_loc: SourceRange) -> Self {
+    pub fn from(s: &'a str, s_loc: SourceSpan) -> Self {
         Ident {
             name: Cow::Borrowed(s),
             s_loc,

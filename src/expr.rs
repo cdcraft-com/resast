@@ -1,5 +1,5 @@
 use crate::pat::Pat;
-use crate::{AssignOp, BinaryOp, LogicalOp, PropKind, SourceRange, UnaryOp, UpdateOp};
+use crate::{AssignOp, BinaryOp, LogicalOp, PropKind, SourceSpan, UnaryOp, UpdateOp};
 use crate::{Class, Func, FuncArg, FuncBody, Ident};
 use std::borrow::Cow;
 /// A slightly more granular program part that a statement
@@ -94,7 +94,7 @@ pub enum Expr<'a> {
 }
 
 impl<'a> Expr<'a> {
-    pub fn ident_from(s: &'a str, s_loc: SourceRange) -> Self {
+    pub fn ident_from(s: &'a str, s_loc: SourceSpan) -> Self {
         Expr::Ident(Ident::from(s, s_loc))
     }
 }
