@@ -27,7 +27,7 @@ pub struct SourceSpan {
     pub start: SourcePos,
     pub end: SourcePos,
     pub in_map: bool,
-    pub source: Option<String>
+    pub source: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -48,10 +48,18 @@ impl<'a> Ident<'a> {
             s_loc,
         }
     }
-    pub fn from(s: &'a str, s_loc: SourceSpan) -> Self {
+
+    pub fn from_with_span(s: &'a str, s_loc: SourceSpan) -> Self {
         Ident {
             name: Cow::Borrowed(s),
-            s_loc,
+            s_loc
+        }
+    }
+
+    pub fn from(s: &'a str) -> Self {
+        Ident {
+            name: Cow::Borrowed(s),
+            s_loc: SourceSpan::default(),
         }
     }
 }
@@ -398,6 +406,6 @@ pub mod prelude {
     };
     pub use crate::{
         AssignOp, BinaryOp, Class, ClassBody, Dir, Func, FuncArg, FuncBody, Ident, LogicalOp,
-        Program, ProgramPart, PropKind, UnaryOp, UpdateOp, VarKind,
+        Program, ProgramPart, PropKind, SourceSpan, UnaryOp, UpdateOp, VarKind,
     };
 }
