@@ -17,17 +17,25 @@ use pat::Pat;
 use stmt::Stmt;
 
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
+#[cfg_attr(
+    all(feature = "serde", not(feature = "esprima")),
+    derive(Deserialize, Serialize)
+)]
+#[cfg_attr(all(feature = "serde", feature = "esprima"), derive(Deserialize))]
 pub struct SourcePos {
     pub line: u32,
     pub col: u32,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
+#[cfg_attr(
+    all(feature = "serde", not(feature = "esprima")),
+    derive(Deserialize, Serialize)
+)]
+#[cfg_attr(all(feature = "serde", feature = "esprima"), derive(Deserialize))]
 pub struct SourceSpan {
     pub start: SourcePos,
-    pub end: SourcePos,
     pub in_map: bool,
-    pub source: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq)]
