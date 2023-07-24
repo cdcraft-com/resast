@@ -70,6 +70,13 @@ impl<'a> Ident<'a> {
             s_loc: SourceSpan::default(),
         }
     }
+
+    pub fn from_with_pos(s: &'a str, line: u32, column: u32) -> Self {
+        Ident {
+            name: Cow::Borrowed(s),
+            s_loc: SourceSpan { start: SourcePos { line: line - 1, col: column - 1 }, in_map: true },
+        }
+    }
 }
 
 /// A fully parsed javascript program.
