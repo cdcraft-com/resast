@@ -22,6 +22,10 @@ impl<'a> Pat<'a> {
         Pat::Ident(Ident::from(s))
     }
 
+    pub fn ident_from_with_pos(s: &'a str, line: u32, column: u32) -> Self {
+        Pat::Ident(Ident::from_with_pos(s, line, column))
+    }
+
     pub fn ident_from_with_span(s: &'a str, s_loc: SourceSpan) -> Self {
         Pat::Ident(Ident::from_with_span(s, s_loc))
     }

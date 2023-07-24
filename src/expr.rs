@@ -98,6 +98,10 @@ impl<'a> Expr<'a> {
         Expr::Ident(Ident::from(s))
     }
 
+    pub fn ident_from_with_pos(s: &'a str, line: u32, column: u32) -> Self {
+        Expr::Ident(Ident::from_with_pos(s, line, column))
+    }
+
     pub fn ident_from_with_span(s: &'a str, s_loc: SourceSpan) -> Self {
         Expr::Ident(Ident::from_with_span(s, s_loc))
     }
