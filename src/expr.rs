@@ -135,6 +135,8 @@ pub struct Prop<'a> {
     pub computed: bool,
     pub short_hand: bool,
     pub is_static: bool,
+    pub is_gen: bool,
+    pub is_async: bool,
 }
 
 /// An object literal or class property identifier
@@ -226,6 +228,7 @@ pub struct MemberExpr<'a> {
     pub object: Box<Expr<'a>>,
     pub property: Box<Expr<'a>>,
     pub computed: bool,
+    pub question: bool,
 }
 
 /// A ternery expression
@@ -249,6 +252,7 @@ pub struct ConditionalExpr<'a> {
 pub struct CallExpr<'a> {
     pub callee: Box<Expr<'a>>,
     pub arguments: Vec<Expr<'a>>,
+    pub question: bool,
 }
 
 /// Calling a constructor

@@ -284,6 +284,7 @@ pub enum VarKind {
     Var,
     Let,
     Const,
+    Using,
 }
 
 /// The available operators for assignment Exprs
@@ -307,6 +308,9 @@ pub enum AssignOp {
     XOrEqual,
     AndEqual,
     PowerOfEqual,
+    NullishCoalescEqual,
+    LogicalAndEqual,
+    LogicalOrEqual,
 }
 
 /// The available logical operators
@@ -351,6 +355,7 @@ pub enum BinaryOp {
     In,
     InstanceOf,
     PowerOf,
+    NullishCoalesc,
 }
 
 /// `++` or `--`
